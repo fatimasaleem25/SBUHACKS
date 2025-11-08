@@ -1,0 +1,17 @@
+# repo root
+mkdir -p backend data
+cat > data/sample_ideas.json <<'JSON'
+[
+  {"user":"A","idea":"A lightweight Pomodoro app that auto-schedules focus slots."},
+  {"user":"B","idea":"An AI that summarizes meeting notes into tasks."},
+  {"user":"C","idea":"A peer-to-peer tutoring marketplace for high-school math."},
+  {"user":"D","idea":"Wearable that nudges posture and logs wellness trends."},
+  {"user":"E","idea":"A browser plugin that groups similar open tabs into projects."},
+  {"user":"F","idea":"Shared whiteboard where AI suggests synthesis of sticky notes."},
+  {"user":"G","idea":"Micro-survey tool to collect team priorities before sprint planning."},
+  {"user":"H","idea":"A habit-tracking social feed with accountability circles."}
+]
+JSON
+
+git add data/sample_ideas.json
+git commit -m "Add sample idea set"
