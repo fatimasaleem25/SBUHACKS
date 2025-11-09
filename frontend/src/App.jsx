@@ -1,51 +1,73 @@
-import { useEffect, useState } from "react";
-import { getRoot, postCluster } from "./api";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
-export default function App() {
-  const [msg, setMsg] = useState("");
-  const [graph, setGraph] = useState(null);
-  const [input, setInput] = useState("AI in education\nShared memory\nVoice notes");
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import MyProjects from "./components/MyProjects";
+import CreateProject from "./components/CreateProject";
+import ProjectDetail from "./components/ProjectDetail";
+import Collaborators from "./components/Collaborators";
+import AIInsights from "./components/AIInsights";
+import MindMaps from "./components/MindMaps";
+import Transcripts from "./components/Transcripts";
+import Settings from "./components/Settings";
 
-  useEffect(() => {
-    // test GET /
-    getRoot()
-      .then(data => setMsg(data.message))
-      .catch(err => setMsg("Backend unreachable: " + err.message));
-  }, []);
+function App() {
+  const { isAuthenticated, isLoading, user, logout } = useAuth0();
 
-  const handleGenerate = async () => {
-    try {
-      const result = await postCluster(input);
-      setGraph(result);
-    } catch (e) {
-      setGraph({ error: e.message });
-    }
-  };
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          backgroundColor: "#0A1126",
+          color: "#C9D8E6",
+          fontSize: "1.2rem",
+        }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
 
   return (
-    <div style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>
-      <h1>MindMesh — Frontend Test</h1>
-      <p><strong>Backend says:</strong> {msg}</p>
-
-      <div style={{ marginTop: 20 }}>
-        <textarea
-          rows={5}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          style={{ width: "100%", padding: 10 }}
-        />
-        <button onClick={handleGenerate} style={{ marginTop: 8, padding: "8px 12px" }}>
-          Generate Mesh
-        </button>
-      </div>
-
-      <div style={{ marginTop: 20 }}>
-        <h3>Graph response</h3>
-        <pre style={{ background: "#f4f4f4", padding: 12 }}>
-          {graph ? JSON.stringify(graph, null, 2) : "No data yet"}
-        </pre>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Dashboard
+              user={user}
+              logout={() => logout({ returnTo: window.location.origin })}
+            />
+          }
+        >
+          <Route index element={<Navigate to="/projects" replace />} />
+          <Route path="projects" element={<MyProjects />} />
+          <Route path="projects/new" element={<CreateProject />} />
+          <Route path="projects/:projectId" element={<ProjectDetail />} />
+          <Route path="collaborators" element={<Collaborators />} />
+          <Route path="ai-insights" element={<AIInsights />} />
+          <Route path="mind-maps" element={<MindMaps />} />
+          <Route path="transcripts" element={<Transcripts />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
+export default App;
